@@ -18,7 +18,7 @@ cordova plugin add https://github.com/gecc001/cordova-plugin-aliyunpushPlugin.gi
 
 # 2.使用步骤
 从本地址git clone 项目到本地，也可以直接线上安装
-### <del>cordova plugin add \<path\> --nofetch --force --variable APP_KEY=*** --variable APP_SECRET=***
+### cordova plugin add \<path\> --nofetch --force --variable APP_KEY=*** --variable APP_SECRET=***
 由于阿里云移动推送的改版，现在Android和iOS的appid和appsercret分离，所以安装命令修改如下：<br>
 ### cordova plugin add \<path\> --nofetch --force --variable ANDROID_APP_KEY=*** --variable ANDROID_APP_SECRET=*** --variable IOS_APP_KEY=*** --variable IOS_APP_SECRET=***
 使用cordova add plugin命令把plugin安装到项目中。<br>
