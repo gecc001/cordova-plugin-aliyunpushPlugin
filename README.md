@@ -178,8 +178,8 @@ iOS处理用户点击通知回调，（数据格式与android不同）
 
 # 6.小米华为辅助通道配置
 
-![小米华为辅助通道的配置](./md_images/huawei-xiaomi.png)
-上图中在init(this)；方法下面打开注释的三行即打开了小米华为的辅助推送通道，关于小米、华为开发者账号的注册请参照：
+![小米华为辅助通道的配置]
+在init(this)；方法下面打开注释的三行即打开了小米华为的辅助推送通道，关于小米、华为开发者账号的注册请参照：
 [移动辅助通道配置](https://help.aliyun.com/document_detail/30067.html?spm=5176.doc30064.6.621.uWVKlw)<br>
 小米开发者账号注册：[小米开放平台](https://dev.mi.com/console/)<br>
 华为开发者账号注册：[华为开发者联盟](http://developer.huawei.com/consumer/cn/?spm=5176.doc30067.2.14.rPh7O7)<br>
