@@ -388,7 +388,7 @@ public class AliyunPush extends CordovaPlugin{
         return true;
     }
     private boolean onMessageRes(JSONArray args, final CallbackContext callbackContext)throws JSONException{
-        new DXReceiver().setCallBack(new MsgCallBack() {
+        new MyMessageReceiver().setCallBack(new MsgCallBack() {
             @Override
             public void onMsgResvice(String jsonmsg) {
                 PluginResult pluginResult=new PluginResult(PluginResult.Status.OK,jsonmsg);
@@ -401,7 +401,7 @@ public class AliyunPush extends CordovaPlugin{
     }
 
     private boolean onNotifyClick(JSONArray args, final CallbackContext callbackContext)throws JSONException{
-        new DXReceiver().setNotifyCallBack(new NotifyCallBack() {
+        new MyMessageReceiver().setNotifyCallBack(new NotifyCallBack() {
             @Override
             public void onNotifyClick(String msg) {
                 PluginResult pluginResult=new PluginResult(PluginResult.Status.OK,msg);
