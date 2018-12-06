@@ -1,0 +1,21 @@
+{
+  "name": "AliyunPushPlugin",
+  "version": "1.0.1",
+  "description": "cordova plugin to use the alicloud mobile push",
+  "cordova": {
+    "id": "cordova-plugin-aliyunpushPlugin",
+    "platforms": ["android","iOS"]
+  },
+   "repository": {
+    "type": "git",
+    "url": "https://github.com/gecc001/cordova-plugin-aliyunpushPlugin.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "acmp",
+    "alicloud"
+  ],
+  "author": "gecc",
+  "license": "ISC",
+  "homepage": "https://github.com/gecc001/cordova-plugin-aliyunpushPlugin"
+}
