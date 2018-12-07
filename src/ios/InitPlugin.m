@@ -334,7 +334,7 @@
 /**
  *  处理iOS 10通知(iOS 10+)
  */
-- (void)handleiOS10Notification:(UNNotification *)notification{
+- (void)handleiOS10Notification:(UNNotification *)notification setType:(NSString *)typestr{
     UNNotificationRequest *request = notification.request;
     UNNotificationContent *content = request.content;
     NSDictionary *userInfo = content.userInfo;
@@ -352,7 +352,7 @@
     NSString *extras = [userInfo valueForKey:@"Extras"];
     // 通知打开回执上报
     [CloudPushSDK sendNotificationAck:userInfo];
-    NSString *str=[NSString stringWithFormat:@"{\"at\":%ld,\"title\":\"%@\",\"subtitle\":\"%@\",\"body\":\"%@\",\"badge\":%d,\"extras\":\"%@\"}",[[NSNumber numberWithDouble:[noticeDate timeIntervalSince1970]]integerValue],title,subtitle,body,badge,extras];
+    NSString *str=[NSString stringWithFormat:@"{\"at\":%ld,\"title\":\"%@\",\"subtitle\":\"%@\",\"body\":\"%@\",\"badge\":%d,\"extras\":\"%@\",\"type\":\"%@\"}",[[NSNumber numberWithDouble:[noticeDate timeIntervalSince1970]]integerValue],title,subtitle,body,badge,extras,typestr];
     if (_notifycallback!=NULL) {
         _notifycallback(str);
     }
@@ -363,11 +363,12 @@
  */
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
     NSLog(@"Receive a notification in foregound.");
-    //  [self handleiOS10Notification:notification];
+    [self handleiOS10Notification:notification setType:@"notification"];
     // 通知不弹出
     // completionHandler(UNNotificationPresentationOptionNone);
     // 通知弹出，且带有声音、内容和角标
     //completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
+    // 通知弹出，且带有声音、内容
     completionHandler(UNNotificationPresentationOptionSound|UNNotificationPresentationOptionAlert);
 }
 
@@ -380,7 +381,7 @@
     if([useraction isEqualToString:UNNotificationDefaultActionIdentifier]){
         NSLog(@"User opened the notification.");
         // 处理iOS 10通知，并上报通知打开回执
-        [self handleiOS10Notification:response.notification];
+        [self handleiOS10Notification:response.notification setType:@"notificationOpened"];
     }
     // 通知dismiss，category创建时传入UNNotificationCategoryOptionCustomDismissAction才可以触发
     if ([userAction isEqualToString:UNNotificationDismissActionIdentifier]) {
