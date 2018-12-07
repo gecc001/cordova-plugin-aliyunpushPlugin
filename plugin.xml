@@ -10,7 +10,7 @@
         <engine name="cordova-android" version=">=5.0.0" />
     </engines>
     <js-module name="AliyunPushPlugin" src="www/AliyunPushPlugin.js">
-        <clobbers target="AliyunPushPlugin" />
+        <clobbers target="cordova.plugins.AliyunPushPlugin" />
     </js-module>
     <preference name="ANDROID_APP_KEY"/>
     <preference name="ANDROID_APP_SECRET"/>
