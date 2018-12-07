@@ -32,7 +32,7 @@
     NSLog(@"divicetoken:%@",deviceToken);
     [CloudPushSDK registerDevice:deviceToken withCallback:^(CloudPushCallbackResult *res) {
         if (res.success) {
-            NSLog(@"Register deviceToken success.");
+            NSLog(@"Register deviceToken success, deviceToken: %@", [CloudPushSDK getApnsDeviceToken]);
         } else {
             NSLog(@"Register deviceToken failed, error: %@", res.error);
         }
@@ -67,6 +67,10 @@
     NSLog(@"content = [%@], badge = [%ld], sound = [%@], Extras = [%@]", content, (long)badge, sound, Extras);
     // iOS badge 清0
     application.applicationIconBadgeNumber =0;
+    // 同步通知角标数到服务端
+    // [self syncBadgeNum:0];
+    // 通知打开回执上报
+    // [CloudPushSDK handleReceiveRemoteNotification:userInfo];(Deprecated from v1.8.1)
     [CloudPushSDK sendNotificationAck:userInfo];
 }
 

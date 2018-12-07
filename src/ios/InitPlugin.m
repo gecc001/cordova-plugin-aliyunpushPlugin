@@ -197,8 +197,8 @@
 
 -(void)init:(CDVInvokedUrlCommand *)cmd{
     [self initPush:cmd];
-    [self registerMessageReceive];
     [self listenerOnChannelOpened];
+    [self registerMessageReceive];
     [CloudPushSDK sendNotificationAck:NULL];
 }
 
@@ -222,7 +222,8 @@
 }
 
 - (void)registerAPNS:(UIApplication *)application {
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 10.0) {
+    float systemVersionNum = [[[UIDevice currentDevice] systemVersion] floatValue];
+    if (systemVersionNum >= 10.0) {
         // iOS 10 notifications
         _notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
         // 创建category，并注册到通知中心
@@ -242,7 +243,7 @@
                 NSLog(@"User denied notification.");
             }
         }];
-    } else if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+    } else if (systemVersionNum >= 8.0) {
         // iOS 8 Notifications
         [application registerUserNotificationSettings:
          [UIUserNotificationSettings settingsForTypes:
@@ -255,6 +256,20 @@
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
          (UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound)];
     }
+}
+
+
+/**
+ *  主动获取设备通知是否授权(iOS 10+)
+ */
+- (void)getNotificationSettingStatus {
+    [_notificationCenter getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+            NSLog(@"User authed.");
+        } else {
+            NSLog(@"User denied.");
+        }
+    }];
 }
 
 /**
@@ -287,6 +302,7 @@
  *    @param notification
  */
 - (void)onMessageReceived:(NSNotification *)notification {
+    NSLog(@"Receive one message!");
     CCPSysMessage *message = [notification object];
     NSString *jstr= [NSString stringWithFormat:@"{\"msgtype\":%hhu,\"msgtitle\":\"%@\",\"msgcontent\":\"%@\"}",message.messageType, [[NSString alloc] initWithData:message.title encoding:NSUTF8StringEncoding],[[NSString alloc] initWithData:message.body encoding:NSUTF8StringEncoding]];
     if (_messagecallback!=NULL) {
@@ -294,6 +310,9 @@
     }
 }
 
+/**
+ *	注册推送通道打开监听
+ */
 - (void)listenerOnChannelOpened {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onChannelOpened:)
@@ -302,7 +321,11 @@
 }
 
 
-// 通道打开通知
+/**
+ *	推送通道打开回调
+ *
+ *	@param 	notification
+ */
 - (void)onChannelOpened:(NSNotification *)notification {
     NSLog(@"通道已建立");
 }
@@ -315,11 +338,17 @@
     UNNotificationRequest *request = notification.request;
     UNNotificationContent *content = request.content;
     NSDictionary *userInfo = content.userInfo;
+    // 通知时间
     NSDate *noticeDate = notification.date;
+    // 标题
     NSString *title = content.title;
+    // 副标题
     NSString *subtitle = content.subtitle;
+    // 内容
     NSString *body = content.body;
+    // 角标
     int badge = [content.badge intValue];
+    // 取得通知自定义字段内容，例：获取key为"Extras"的内容
     NSString *extras = [userInfo valueForKey:@"Extras"];
     // 通知打开回执上报
     [CloudPushSDK sendNotificationAck:userInfo];
@@ -334,16 +363,41 @@
  */
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
     NSLog(@"Receive a notification in foregound.");
-//    [self handleiOS10Notification:notification background:0];
+    //  [self handleiOS10Notification:notification];
+    // 通知不弹出
+    // completionHandler(UNNotificationPresentationOptionNone);
+    // 通知弹出，且带有声音、内容和角标
+    //completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
     completionHandler(UNNotificationPresentationOptionSound|UNNotificationPresentationOptionAlert);
 }
 
+/**
+ *  触发通知动作时回调，比如点击、删除通知和点击自定义action(iOS 10+)
+ */
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler{
     NSString *useraction=response.actionIdentifier;
+    // 点击通知打开
     if([useraction isEqualToString:UNNotificationDefaultActionIdentifier]){
+        NSLog(@"User opened the notification.");
+        // 处理iOS 10通知，并上报通知打开回执
         [self handleiOS10Notification:response.notification];
     }
+    // 通知dismiss，category创建时传入UNNotificationCategoryOptionCustomDismissAction才可以触发
+    if ([userAction isEqualToString:UNNotificationDismissActionIdentifier]) {
+        NSLog(@"User dismissed the notification.");
+    }
     completionHandler();
+}
+
+/* 同步通知角标数到服务端 */
+- (void)syncBadgeNum:(NSUInteger)badgeNum {
+    [CloudPushSDK syncBadgeNum:badgeNum withCallback:^(CloudPushCallbackResult *res) {
+        if (res.success) {
+            NSLog(@"Sync badge num: [%lu] success.", (unsigned long)badgeNum);
+        } else {
+            NSLog(@"Sync badge num: [%lu] failed, error: %@", (unsigned long)badgeNum, res.error);
+        }
+    }];
 }
 
 
