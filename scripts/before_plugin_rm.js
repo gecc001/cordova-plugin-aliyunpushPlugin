@@ -23,7 +23,7 @@ module.exports = function(context) {
                 throw new Error('Unable to find AndroidManifest.xml: ' + err);
             }
 
-            var appClass = 'com.aliyun.pushplugin.AliyunPush.MainApplication';
+            var appClass = 'com.aliyun.pushplugin.MainApplication';
 
             if (data.indexOf(appClass) != -1) {
 
